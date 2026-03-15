@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Savignyring – YT-Dwnldr</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      font-family: 'Times New Roman', serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .container {
+      width: 100%;
+      padding: 32px 16px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      max-width: 980px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 10px 0 24px 0;
+      color: #fff;
+      text-align: center;
+    }
+
+    .panel {
+      background: #0b0b0b;
+      border: 2px solid #fff;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    input[type="url"] {
+      background: #000;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      padding: 14px 12px;
+      font-size: 1rem;
+      font-family: 'Times New Roman', serif;
+      outline: none;
+    }
+
+    button {
+      background-color: #1f1f1f;
+      color: #fff;
+      border: 2px solid #fff;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-family: 'Times New Roman', serif;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+      width: 100%;
+    }
+    button:hover { background-color: #333; color: #fff; }
+
+    .hint {
+      color: #bbb;
+      font-size: 0.95rem;
+      margin: 0 0 10px 0;
+      text-align: center;
+      letter-spacing: .2px;
+    }
+
+    pre#log {
+      background: #111;
+      color: #eee;
+      padding: 16px;
+      border-radius: 8px;
+      border: 2px solid #fff;
+      overflow: auto;
+      max-height: 60vh;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+    }
+
+    footer {
+      width: 100%;
+      padding: 16px 0 calc(16px + env(safe-area-inset-bottom));
+      text-align: center;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+      color: #fff;
+      font-family: 'Times New Roman', serif;
+    }
+
+    .logo {
+      width: 150px; height: auto; display: block; margin: 0 auto 10px auto;
+    }
+
+    @media (max-width: 700px) {
+      h1 { font-size: 1.9rem; }
+      .form-row { grid-template-columns: 1fr; }
+      button { padding: 12px 16px; font-size: 0.95rem; }
+      footer { font-size: 1rem; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- gleiches Logo wie Dashboard -->
+    <img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATwAAADuCAYAAACkhLuWAAAAAXNSR0IArs4c6QAAAHhlWElmTU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAIdpAAQAAAABAAAATgAAAAAAAACQAAAAAQAAAJAAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAATygAwAEAAAAAQAAAO4AAAAARTXLJQAAAAlwSFlzAAAWJQAAFiUBSVIk8AAAQABJREFUeAHtvWmwZdlV33levpznqSorK2seJEolSgMItQC1wBbYmkCSNTQIMHSbCFuOpm13RDuiv3WEo6MjGn9o3MYjtEBgNNgCYSQEQtbAZARGAyAhhFRTZlVmZeU8vZeZL1//f2vvtc+559777r0vX1bmvWedzPvOPntYe+3/Xnudtcczt3nLtuUqrkAgEAgEOoDAug6UMYoYCAQCgYAhEAovBCEQCAQ6g0Ao" alt="Logo">
+    <h1>Savignyring – YT‑Dwnldr</h1>
+
+    <p class="hint">Gib eine Video‑URL ein. Es wird die bestmögliche Qualität (bestvideo+bestaudio) geladen und <strong>als MP4</strong> gespeichert.</p>
+
+    <div class="panel">
+      <form id="f" class="form-row" autocomplete="off">
+        <input type="url" name="url" id="url" placeholder="https://…" required />
+        <button type="submit">Download starten</button>
+      </form>
+      <pre id="log">Statusausgabe erscheint hier …</pre>
+    </div>
+  </div>
+
+  <footer>
+    Marcus Simon Spahn, 2025
+  </footer>
+
+  <script>
+    // Live-Streaming der Fortschrittsanzeige beibehalten
+    const f = document.getElementById("f");
+    const log = document.getElementById("log");
+    f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      log.textContent = "";
+      const url = document.getElementById("url").value.trim();
+      if (!url) return;
+
+      try {
+        const resp = await fetch("/api/download", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
+
+        if (!resp.ok || !resp.body) {
+          log.textContent = "Fehler: " + resp.status + " " + resp.statusText;
+          return;
+        }
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          log.textContent += decoder.decode(value, { stream: true });
+          log.scrollTop = log.scrollHeight;
+        }
+      } catch (err) {
+        log.textContent = "❌ Netzwerk-/Serverfehler: " + (err?.message || err);
+      }
+    });
+  </script>
+</body>
+</html>

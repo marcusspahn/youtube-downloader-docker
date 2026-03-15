@@ -1,0 +1,16 @@
+services:
+  backend:
+    container_name: yt-dwnlder
+    build:
+      context: ./backend
+    image: yt-dwnlder-backend
+    user: 1000:100
+    ports:
+      - "8099:8099"
+    environment:
+      DOWNLOAD_DIR: /downloads
+      COOKIES_PATH: /cookies/cookies.txt
+    volumes:
+      - /mnt/hdd/videos:/downloads
+      - /mnt/ssd/docker/yt-dwnlder/cookies:/cookies
+    restart: unless-stopped

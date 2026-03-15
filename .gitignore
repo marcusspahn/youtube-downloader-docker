@@ -1,0 +1,5 @@
+cookies/cookies.txt
+downloads/
+*.log
+.DS_Store
+*.bak
