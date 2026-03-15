@@ -6,6 +6,18 @@ The application provides a lightweight browser interface where you can paste a v
 
 ---
 
+## Screenshots
+
+### Web Interface
+
+![Interface](screenshots/screen1.png)
+
+### Download Status
+
+![Status](screenshots/screen2.png)
+
+---
+
 ## Features
 
 - Download YouTube videos via web interface
@@ -30,7 +42,7 @@ yt-dlp
 ↓  
 ffmpeg (auto convert to MP4)  
 ↓  
-Local storage  
+Local storage
 
 ---
 
@@ -55,11 +67,12 @@ http://YOUR-SERVER-IP:8099
 
 The container runs a Flask backend on port **8099**.
 
-Example volume mapping:
+Persistent directories:
 
-/mnt/hdd/videos → /downloads
+./downloads → /downloads  
+./cookies → /cookies
 
-Downloaded videos will appear directly in your host folder.
+Downloaded videos will appear in the **downloads** folder.
 
 ---
 
