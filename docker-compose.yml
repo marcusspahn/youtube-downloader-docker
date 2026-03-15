@@ -7,11 +7,13 @@ services:
     user: 1000:100
     ports:
       - "8099:8099"
+
     environment:
       DOWNLOAD_DIR: /downloads
       COOKIES_PATH: /cookies/cookies.txt
+
     volumes:
-      volumes:
-  - ./downloads:/downloads
-  - ./cookies:/cookies
+      - ./downloads:/downloads
+      - ./cookies:/cookies
+
     restart: unless-stopped
