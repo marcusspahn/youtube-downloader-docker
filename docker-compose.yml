@@ -11,6 +11,7 @@ services:
       DOWNLOAD_DIR: /downloads
       COOKIES_PATH: /cookies/cookies.txt
     volumes:
-      - /mnt/hdd/videos:/downloads
-      - /mnt/ssd/docker/yt-dwnlder/cookies:/cookies
+      volumes:
+  - ./downloads:/downloads
+  - ./cookies:/cookies
     restart: unless-stopped
